@@ -17,7 +17,7 @@ public class SystemManager : ManagerBase
 		}
 	}
 
-    public bool IsInit { get; set; } = false;
+	public bool IsInit { get; set; } = false;
 
 	private void Awake()
 	{
