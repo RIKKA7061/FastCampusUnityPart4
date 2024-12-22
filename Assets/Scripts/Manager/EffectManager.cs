@@ -2,10 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class EffectManager : MonoBehaviour
+public class EffectManager : ManagerBase
 {
 	[SerializeField] private GameObject[] effectPrefabs;
 	[SerializeField] private float[] destoryTime;
+
+	private void Awake()
+	{
+		Dontdestroy<EffectManager>();
+	}
 
 	public void SetInit()
 	{

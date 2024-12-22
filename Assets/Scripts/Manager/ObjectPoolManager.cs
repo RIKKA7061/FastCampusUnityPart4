@@ -3,12 +3,28 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ObjectPoolManager : MonoBehaviour
+public class ObjectPoolManager : ManagerBase
 {
 	private Dictionary<int, List<GameObject>> dics = new Dictionary<int, List<GameObject>>();
 
+	private void Awake()
+	{
+		Dontdestroy<ObjectPoolManager>();
+	}
 	public void SetInit()
 	{
+	}
+
+	public void ObjectPoolReload(bool isInit)
+	{
+		if (isInit)
+		{
+			// ..
+		}
+		else
+		{
+			// ..
+		}
 	}
 
 	public GameObject GetObjectByPrefab(GameObject prefab, Transform parent, Vector3 position, Quaternion rotation)

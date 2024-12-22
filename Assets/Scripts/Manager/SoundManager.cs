@@ -3,11 +3,15 @@ using System.Collections.Generic;
 using System.Net.NetworkInformation;
 using UnityEngine;
 
-public class SoundManager : MonoBehaviour
+public class SoundManager : ManagerBase
 {
 	[SerializeField] private AudioClip[] audioClips;
 	private AudioSource[] audioSources; // cache
 
+	private void Awake()
+	{
+		Dontdestroy<SoundManager>();
+	}
 	public void SetInit()
 	{
 	}
@@ -15,11 +19,11 @@ public class SoundManager : MonoBehaviour
 	// Start is called before the first frame update
 	void Start()
 	{
-		audioSources = new AudioSource[audioClips.Length];
-		for (int i = 0; i < audioSources.Length; i++)
-		{
-		    audioSources[i] = gameObject.AddComponent<AudioSource>();
-		}
+		//audioSources = new AudioSource[audioClips.Length];
+		//for (int i = 0; i < audioSources.Length; i++)
+		//{
+		//    audioSources[i] = gameObject.AddComponent<AudioSource>();
+		//}
 	}
 
 	// Update is called once per frame
