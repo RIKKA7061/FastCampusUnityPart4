@@ -10,7 +10,7 @@ public class SystemManager : ManagerBase
 	{
 		get
 		{
-			Debug.Log("SystemManager Instance");
+			//Debug.Log("SystemManager Instance");
 			if (instance == null)
 				instance = new GameObject("SystemManager").AddComponent<SystemManager>();
 			return instance;
@@ -21,13 +21,13 @@ public class SystemManager : ManagerBase
 
 	private void Awake()
 	{
-		Debug.Log("SystemManager Awake");
+		//Debug.Log("SystemManager Awake");
 		Dontdestroy<SystemManager>();
 	}
 
 	public void SetInit()
     {
-		Debug.Log("SystemManager SetInit");
+		//Debug.Log("SystemManager SetInit");
 		IsInit = true;
     }
 }

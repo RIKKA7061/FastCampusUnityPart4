@@ -18,6 +18,7 @@ public class InitScene_Init : MonoBehaviour
 	private EffectManager effectManager; // cache
 	private SoundManager soundManager; // cache
 	private WindowManager windowManager; // cache
+	private NetworkManager networkManager; // cache
 
 	private void Awake()
 	{
@@ -30,6 +31,7 @@ public class InitScene_Init : MonoBehaviour
 			effectManager = new GameObject("EffectManager").AddComponent<EffectManager>();
 			soundManager = new GameObject("SoundManager").AddComponent<SoundManager>();
 			windowManager = new GameObject("WindowManager").AddComponent<WindowManager>();
+			networkManager = new GameObject("NetworkManager").AddComponent<NetworkManager>();
 		}
 		else
 		{
@@ -37,6 +39,7 @@ public class InitScene_Init : MonoBehaviour
 			effectManager = FindAnyObjectByType<EffectManager>();
 			soundManager = FindAnyObjectByType<SoundManager>();
 			windowManager = FindAnyObjectByType<WindowManager>();
+			networkManager = FindAnyObjectByType<NetworkManager>();
 		}
 	}
 
@@ -56,6 +59,7 @@ public class InitScene_Init : MonoBehaviour
 			SoundManager,
 			WindowManagerInit,
 			SceneLoadManagerInit,
+			NetworkManagerInit,
 			LoadScene
 		};
 
@@ -102,8 +106,17 @@ public class InitScene_Init : MonoBehaviour
 		SceneLoadManager.Instance.SetInit();
 	}
 
+	private void NetworkManagerInit()
+	{
+		networkManager.SetInit(apiUrl: Config.SERVER_API_URL);
+		networkManager.SendPacket();
+	}
+
+
 	private void LoadScene()
 	{
 		SceneLoadManager.Instance.SceneLoad(SceneLoadManager.Instance.InitSceneType);
 	}
+
+
 }
