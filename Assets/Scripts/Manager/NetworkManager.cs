@@ -12,59 +12,59 @@ public class CertHandler : CertificateHandler
 	}
 }
 
-public class SendPacketBase
-{
-	public readonly string PacketName;
+//public class SendPacketBase
+//{
+//	public readonly string PacketName;
 
-	public SendPacketBase(PACKET_NAME_TYPE packetName)
-	{
-		PacketName = packetName.ToString();
-	}
-}
+//	public SendPacketBase(PACKET_NAME_TYPE packetName)
+//	{
+//		PacketName = packetName.ToString();
+//	}
+//}
 
-public class ReceivePacketBase
-{
-	public readonly int ReturenCode; // Success, Fail
+//public class ReceivePacketBase
+//{
+//	public readonly int ReturenCode; // Success, Fail
 
-	public ReceivePacketBase(int returenCode)
-	{
-		ReturenCode = returenCode;
-	}
-}
+//	public ReceivePacketBase(int returenCode)
+//	{
+//		ReturenCode = returenCode;
+//	}
+//}
 
-public class ApplicationConfigSendPacket : SendPacketBase // <- parent
-{
-	// server -> as environment -> we CHOOSE different localhost address
-	//
-	// Ex...
-	// enviroment: dev, stage, live
-	// os type: Android, iOS
-	// version: 1.0.0
+//public class ApplicationConfigSendPacket : SendPacketBase // <- parent
+//{
+//	// server -> as environment -> we CHOOSE different localhost address
+//	//
+//	// Ex...
+//	// enviroment: dev, stage, live
+//	// os type: Android, iOS
+//	// version: 1.0.0
 
-	public int E_ENVIRONMENT_TYPE;
-	public int E_OS_TYPE;
-	public string AppVersion;
+//	public int E_ENVIRONMENT_TYPE;
+//	public int E_OS_TYPE;
+//	public string AppVersion;
 
-	public ApplicationConfigSendPacket(PACKET_NAME_TYPE packetName, 
-		ENVIRONMENT_TYPE e_ENVIRONMENT_TYPE, 
-		OS_TYPE e_OS_TYPE, 
-		string appVersion) : base(packetName)
-	{
-		E_ENVIRONMENT_TYPE = (int)e_ENVIRONMENT_TYPE;
-		E_OS_TYPE = (int)e_OS_TYPE;
-		AppVersion = appVersion;
-	}
-}
+//	public ApplicationConfigSendPacket(PACKET_NAME_TYPE packetName, 
+//		ENVIRONMENT_TYPE e_ENVIRONMENT_TYPE, 
+//		OS_TYPE e_OS_TYPE, 
+//		string appVersion) : base(packetName)
+//	{
+//		E_ENVIRONMENT_TYPE = (int)e_ENVIRONMENT_TYPE;
+//		E_OS_TYPE = (int)e_OS_TYPE;
+//		AppVersion = appVersion;
+//	}
+//}
 
-public class ApplicationConfigReceivePacket : ReceivePacketBase
-{
-	public readonly string ApiUrl;
+//public class ApplicationConfigReceivePacket : ReceivePacketBase
+//{
+//	public readonly string ApiUrl;
 
-	public ApplicationConfigReceivePacket(int returnCode,string apiUrl) : base(returnCode)
-	{
-		ApiUrl = apiUrl;
-	}
-}
+//	public ApplicationConfigReceivePacket(int returnCode,string apiUrl) : base(returnCode)
+//	{
+//		ApiUrl = apiUrl;
+//	}
+//}
 
 public class NetworkManager : ManagerBase
 {
@@ -80,20 +80,15 @@ public class NetworkManager : ManagerBase
 		this.apiUrl = apiUrl;
 	}
 
-	public void SendPacket()
+	public void SendPacket(SendPacketBase sendPacketBase)
 	{
-		StartCoroutine(GetDataFromServer());	
+		StartCoroutine(GetDataFromServer(sendPacketBase));	
 	}
 
-	IEnumerator GetDataFromServer()
+	IEnumerator GetDataFromServer(SendPacketBase sendPacketBase)
 	{
-		ApplicationConfigSendPacket applicationConfigSendPacket
-			= new ApplicationConfigSendPacket(PACKET_NAME_TYPE.ApplicationConfig,
-			Config.E_ENVIRONMENT_TYPE,
-			Config.E_OS_TYPE,
-			Config.APP_VERSION);
-
-		string packet = JsonUtility.ToJson(applicationConfigSendPacket);
+		
+		string packet = JsonUtility.ToJson(sendPacketBase);
 
 		Debug.Log("[NetworkManager Send Packet] " + packet);
 
@@ -120,6 +115,13 @@ public class NetworkManager : ManagerBase
 				// success case
 				string jsonData = request.downloadHandler.text;
 				Debug.Log("Received Data: " + jsonData);
+
+				ApplicationConfigReceivePacket applicationConfigReceivePacket 
+					= JsonUtility.FromJson<ApplicationConfigReceivePacket>(jsonData);
+
+				Debug.Log("Received");
+
+				var a = 1;
 
 				// json Data use..
 
