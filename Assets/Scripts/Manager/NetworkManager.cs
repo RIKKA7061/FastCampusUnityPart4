@@ -68,38 +68,35 @@ public class CertHandler : CertificateHandler
 
 public class NetworkManager : ManagerBase
 {
-	private string apiUrl;
-
 	private void Awake()
 	{
 		Dontdestroy<NetworkManager>();
 	}
 
-	public void SetInit(string apiUrl)
+	public void SetInit()
 	{
-		this.apiUrl = apiUrl;
 	}
 
-	public void SendPacket(SendPacketBase sendPacketBase)
-	{
-		StartCoroutine(GetDataFromServer(sendPacketBase));	
-	}
+	//public void SendPacket(SendPacketBase sendPacketBase)
+	//{
+	//	StartCoroutine(GetDataFromServer(sendPacketBase));	
+	//}
 
-	IEnumerator GetDataFromServer(SendPacketBase sendPacketBase)
+	public IEnumerator GetDataFromServer<T>(SendLetterBase sendPacketBase, Action<ReceiveLetterBase> action = null) where T : ReceiveLetterBase
 	{
 		
 		string packet = JsonUtility.ToJson(sendPacketBase);
 
 		Debug.Log("[NetworkManager Send Packet] " + packet);
 
-		using (UnityWebRequest request = UnityWebRequest.PostWwwForm(this.apiUrl, packet))
+		using (UnityWebRequest request = UnityWebRequest.PostWwwForm(sendPacketBase.url, packet))
 		{
 			byte[] bytes = new System.Text.UTF8Encoding().GetBytes(packet);
 			request.uploadHandler = new UploadHandlerRaw(bytes);
 			request.downloadHandler = new DownloadHandlerBuffer();
 			request.SetRequestHeader("Content-Type", "application/json");
 
-			// HTTP connect security Setting
+			// HTTPS SECURITY
 			request.certificateHandler = new CertHandler();
 
 			yield return request.SendWebRequest();
@@ -107,24 +104,20 @@ public class NetworkManager : ManagerBase
 			//if(request.isNetworkError || request.isHttpError)
 			if (request.result == UnityWebRequest.Result.ConnectionError || request.result == UnityWebRequest.Result.ProtocolError)
 			{
-				// error case
-				Debug.Log("Error: " + request.error);
+				// ERROR
+				Debug.LogError("Error: " + request.error);
+				yield return null;
+				action?.Invoke(new ReceiveLetterBase((int)RETURN_CODE.Error));
 			}
 			else
 			{
-				// success case
+				// SUCCESS
 				string jsonData = request.downloadHandler.text;
 				Debug.Log("Received Data: " + jsonData);
 
-				ApplicationConfigReceivePacket applicationConfigReceivePacket 
-					= JsonUtility.FromJson<ApplicationConfigReceivePacket>(jsonData);
-
-				Debug.Log("Received");
-
-				var a = 1;
-
-				// json Data use..
-
+				T receivePacket = JsonUtility.FromJson<T>(jsonData);
+				yield return receivePacket;
+				action?.Invoke(receivePacket);
 			}
 		}
 	}

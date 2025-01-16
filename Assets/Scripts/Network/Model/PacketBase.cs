@@ -1,19 +1,21 @@
 ﻿
-public class SendPacketBase
+public class SendLetterBase
 {
+	public string url;
 	public string PacketName;
 
-	public SendPacketBase(PACKET_NAME_TYPE packetName)
+	public SendLetterBase(string url, PACKET_NAME_TYPE packetName)
 	{
-		PacketName = packetName.ToString();
+		this.url = url;
+		this.PacketName = packetName.ToString();
 	}
 }
 
-public class ReceivePacketBase
+public class ReceiveLetterBase
 {
 	public int ReturenCode; // Success, Fail
 
-	public ReceivePacketBase(int returenCode)
+	public ReceiveLetterBase(int returenCode)
 	{
 		ReturenCode = returenCode;
 	}

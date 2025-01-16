@@ -17,13 +17,13 @@ public class Config
 #endif
 
 #if DEV
-	public const string SERVER_API_URL = "https://localhost:7162/";
+	public const string SERVER_App_API_URL = "https://localhost:7162/";
 #elif STAGE
-	public const string SERVER_API_URL = "https://localhost:7162/";
+	public const string SERVER_App_API_URL = "https://localhost:7162/";
 #elif LIVE
-	public const string SERVER_API_URL = "https://localhost:7162/";
+	public const string SERVER_App_API_URL = "https://localhost:7162/";
 #else
-	public const string SERVER_API_URL = "https://localhost:7162/";
+	public const string SERVER_App_API_URL = "https://localhost:7162/";
 #endif
 
 

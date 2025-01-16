@@ -6,6 +6,9 @@ using UnityEngine.SceneManagement;
 
 public class InitScene_Init : MonoBehaviour
 {
+	[SerializeField] private GameObject PrefabPopUpMessage;
+	[SerializeField] private Transform PosPopUpMessage;
+
 	private static bool isInit = false;
 
 	private const int PROGRESS_VALUE = 5;
@@ -51,6 +54,33 @@ public class InitScene_Init : MonoBehaviour
 
 	private IEnumerator C_Manager()
 	{
+		NetworkManagerInit();
+
+		IEnumerator eNumeRator = NetworkManagerInit();
+		yield return StartCoroutine(eNumeRator);
+		bool isNetworkManagerSuCCESS = (bool)eNumeRator.Current;
+		if (!isNetworkManagerSuCCESS)
+		{
+			Debug.Log("서버오류, 안내창 띄어주기~");
+			GameObject ObjPopUpMessage = Instantiate(PrefabPopUpMessage, PosPopUpMessage);
+
+			PopupMessageInfo popUpMessageInfo = new PopupMessageInfo(POPUP_MESSAGE_TYPE.ONE_BUTTON, "서버오류", "서버오류가 발생하였습니다. 다시 접속하여 주세요.");
+			PopupMessage popUpMessage = ObjPopUpMessage.GetComponent<PopupMessage>();
+			popUpMessage.OpenMessage(popUpMessageInfo, null, () =>
+			{
+				// 앱 종료
+				Application.Quit();
+			});
+
+			yield break;
+		}
+
+		yield return StartCoroutine(ETCManager());
+
+	}
+
+	private IEnumerator ETCManager()
+	{
 		List<Action> actions = new List<Action>
 		{
 			SystemManagerInit,
@@ -59,7 +89,6 @@ public class InitScene_Init : MonoBehaviour
 			SoundManager,
 			WindowManagerInit,
 			SceneLoadManagerInit,
-			NetworkManagerInit,
 			LoadScene
 		};
 
@@ -106,19 +135,50 @@ public class InitScene_Init : MonoBehaviour
 		SceneLoadManager.Instance.SetInit();
 	}
 
-	private void NetworkManagerInit()
+	private IEnumerator NetworkManagerInit()
 	{
-		networkManager.SetInit(apiUrl: Config.SERVER_API_URL);
+		networkManager.SetInit();
 
 		ApplicationConfigSendPacket applicationConfigSendPacket
-			= new ApplicationConfigSendPacket(PACKET_NAME_TYPE.ApplicationConfig,
+			= new ApplicationConfigSendPacket(
+			Config.SERVER_App_API_URL,
+			PACKET_NAME_TYPE.ApplicationConfig,
 			Config.E_ENVIRONMENT_TYPE,
 			Config.E_OS_TYPE,
 			Config.APP_VERSION);
 
-		networkManager.SendPacket(applicationConfigSendPacket);
+		// Upload on Github, use CallBack..
+		//networkManager.GetDataFromServer<ApplicationConfigReceiveLetter>(applicationConfigSendPacket, AppConFig);
+
+		IEnumerator eNumeRator = networkManager.GetDataFromServer<ApplicationConfigReceiveLetter>(applicationConfigSendPacket);
+		yield return StartCoroutine(eNumeRator);
+		ApplicationConfigReceiveLetter receiveLetter = eNumeRator.Current as ApplicationConfigReceiveLetter;
+		if (receiveLetter != null && receiveLetter.ReturenCode == (int)RETURN_CODE.Success)
+		{
+			SystemManager.Instance.apiURL = receiveLetter.apiURL;
+			yield return true;
+		}
+		else
+		{
+			yield return false;
+		}
 	}
 
+	// Upload on Github, use CallBack..
+	//private void AppConFig(ReceiveLetterBase receiveLetterBase)
+	//{
+	//	ApplicationConfigReceiveLetter receiveLetter = receiveLetterBase as ApplicationConfigReceiveLetter;
+	//	if (receiveLetter != null && receiveLetter.ReturenCode == (int)RETURN_CODE.Success)
+	//	{
+	//		SystemManager.Instance.apiURL = receiveLetter.apiURL;
+	//		Debug.Log("SUCCESS"); // NEXT Behaviors...
+	//		StartCoroutine(ETCManager());
+	//	}
+	//	else
+	//	{
+	//		Debug.Log("Error");
+	//	}
+	//}
 
 	private void LoadScene()
 	{
